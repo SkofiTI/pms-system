@@ -14,5 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return inertia('Home', [
+        'name' => 'Example Name',
+        'stack' => [
+            'Laravel', 'Vue', 'Inertia'
+        ],
+    ]);
 });
