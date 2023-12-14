@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MainController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,11 +14,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return inertia('Home', [
-        'name' => 'Example Name',
-        'stack' => [
-            'Laravel', 'Vue', 'Inertia'
-        ],
-    ]);
-});
+Route::get('/', [MainController::class, 'index'])->name('home');
+Route::get('/{roomId}', [MainController::class, 'show'])->name('show');
