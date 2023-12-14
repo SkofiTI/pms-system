@@ -25,25 +25,42 @@
         </p>
         <p>Цена за ночь - {{ room.price }}</p>
     </div>
-
-    <div>
-        <!-- Календарь с пометками о занятых датах -->
-        <div class="calendar">
-            <div class="header">
+    <div class="calendar">
+        <div class="header">
+            <div class="header__info">
                 <button @click="previousMonth">&lt;</button>
                 <h2>{{ getMonthName(month) }} {{ year }}</h2>
                 <button @click="nextMonth">&gt;</button>
             </div>
-            <div class="days">
-                <div v-for="day in days" :key="day" class="day">
-                    {{ day }}
-                </div>
+            <div class="selectors">
+                <select v-model="month" @change="updateCalendar">
+                    <option value="1">Январь</option>
+                    <option value="2">Февраль</option>
+                    <option value="3">Март</option>
+                    <option value="4">Апрель</option>
+                    <option value="5">Май</option>
+                    <option value="6">Июнь</option>
+                    <option value="7">Июль</option>
+                    <option value="8">Август</option>
+                    <option value="9">Сентябрь</option>
+                    <option value="10">Октябрь</option>
+                    <option value="11">Ноябрь</option>
+                    <option value="12">Декабрь</option>
+                </select>
+                <select v-model="year" @change="updateCalendar">
+                    <option v-for="year in years" :value="year">{{ year }}</option>
+                </select>
             </div>
-            <div class="weeks">
-                <div v-for="week in weeks" :key="week" class="week">
-                    <div v-for="date in week" :key="date" class="date" :class="{ booked: isBooked(date) }">
-                        {{ date }}
-                    </div>
+        </div>
+        <div class="days">
+            <div v-for="day in days" :key="day" class="day">
+                {{ day }}
+            </div>
+        </div>
+        <div class="weeks">
+            <div v-for="week in weeks" :key="week" class="week">
+                <div v-for="date in week" :key="date" class="date" :class="{ booked: isBooked(date) }">
+                    {{ date }}
                 </div>
             </div>
         </div>
@@ -69,33 +86,37 @@
                 const lastDayOfMonth = new Date(this.year, this.month, 0);
                 const weeks = [];
 
-                let week = [];
+                let currentWeek = [];
                 let currentDate = new Date(firstDayOfMonth);
 
                 for (let i = 1; i < currentDate.getDay(); i++) {
-                    week.push(null);
+                    currentWeek.push(null);
                 }
 
                 while (currentDate <= lastDayOfMonth) {
-                    week.push(currentDate.getDate());
+                    currentWeek.push(currentDate.getDate());
 
                     if (currentDate.getDay() === 0) {
-                        weeks.push(week);
-                        week = [];
+                        weeks.push(currentWeek);
+                        currentWeek = [];
                     }
 
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
 
-                for (let i = week.length; i < 7; i++) {
-                    week.push(null);
+                for (let i = currentWeek.length; i < 7; i++) {
+                    currentWeek.push(null);
                 }
 
-                if (week.length > 0) {
-                    weeks.push(week);
+                if (lastDayOfMonth.getDay() !== 0) {
+                    weeks.push(currentWeek);
                 }
 
                 return weeks;
+            },
+            years() {
+                const currentYear = new Date().getFullYear();
+                return [currentYear, currentYear + 1, currentYear + 2];
             },
         },
         methods: {
@@ -116,70 +137,87 @@
                 }
             },
             isBooked(date) {
-            const formattedDate = new Date(this.year, this.month - 1, date);
+                const formattedDate = new Date(this.year, this.month - 1, date);
 
-            if (formattedDate.getMonth() !== this.month - 1) {
-                return false;
-            }
+                if (formattedDate.getMonth() !== this.month - 1) {
+                    return false;
+                }
 
-            return this.bookingDates.some(booking => {
-                const dateIn = new Date(booking.date_in.year, booking.date_in.month - 1, booking.date_in.day);
-                const dateOut = new Date(booking.date_out.year, booking.date_out.month - 1, booking.date_out.day);
-                return formattedDate >= dateIn && formattedDate <= dateOut;
-            });
-        },
+                return this.bookingDates.some(booking => {
+                    const dateIn = new Date(booking.date_in.year, booking.date_in.month - 1, booking.date_in.day);
+                    const dateOut = new Date(booking.date_out.year, booking.date_out.month - 1, booking.date_out.day);
+                    return formattedDate >= dateIn && formattedDate <= dateOut;
+                });
+            },
             getMonthName(month) {
                 const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
                 return months[month - 1];
+            },
+            years() {
+                const currentYear = new Date().getFullYear();
+                return [currentYear, currentYear + 1, currentYear + 2];
             },
         },
     };
 </script>
 
-<style>
-.calendar {
-    display: inline-block;
-    border: 1px solid #ccc;
-    margin-top: 20px;
-    width: 300px;
-}
+<style scoped>
+    .calendar {
+        display: inline-block;
+        border: 1px solid #ccc;
+        margin-top: 20px;
+        width: 300px;
+    }
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    background-color: #f0f0f0;
-}
+    .header {
+        padding: 10px;
+        background-color: #f0f0f0;
+    }
 
-.days {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background-color: #e0e0e0;
-}
+    .header__info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.weeks {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-}
+    .header__info > button {
+        width: 30px;
+        height: 30px;
+    }
 
-.week {
-    display: flex;
-    justify-content: space-between;
-}
+    .selectors {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
 
-.date {
-    width: calc(100% / 7);
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #ccc;
-}
+    .days {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: #e0e0e0;
+    }
 
-.booked {
-    background-color: #ffcccc;
-}
+    .weeks {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .week {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .date {
+        width: calc(100% / 7);
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+    }
+
+    .booked {
+        background-color: #ffcccc;
+    }
 </style>
