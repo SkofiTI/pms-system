@@ -121,18 +121,18 @@
         },
         methods: {
             previousMonth() {
-                if (this.month === 1) {
+                if (this.month === 1 && this.year > new Date().getFullYear()) {
                     this.month = 12;
                     this.year--;
-                } else {
+                } else if (this.month !== 1) {
                     this.month--;
                 }
             },
             nextMonth() {
-                if (this.month === 12) {
+                if (this.month === 12 && this.year < new Date().getFullYear() + 2) {
                     this.month = 1;
                     this.year++;
-                } else {
+                } else if (this.month !== 12) {
                     this.month++;
                 }
             },
