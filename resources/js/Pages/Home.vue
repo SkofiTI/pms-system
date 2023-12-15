@@ -42,7 +42,7 @@
         },
         methods: {
             show(roomId) {
-                router.get(`/${roomId}`);
+                router.get(`/rooms/${roomId}`);
             },
         }
     };

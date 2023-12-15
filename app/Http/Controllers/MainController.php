@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guest;
 use App\Models\Reservation;
 use App\Models\Room;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
@@ -58,6 +61,46 @@ class MainController extends Controller
             'room' => $roomData,
             'bookingDates' => $bookingDates,
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'room_id' => 'required',
+            'date_in' => 'required|date',
+            'date_out' => 'required|date|after:date_in',
+            'name' => 'required',
+            'surname' => 'required',
+            'patronymic' => 'nullable',
+            'address' => 'required',
+            'phone' => 'required',
+            'passport' => 'required',
+        ]);
+
+        $dateIn = Carbon::parse($validated['date_in'])
+            ->setTime(now()->hour, now()->minute, now()->second);
+        
+        $dateOut = Carbon::parse($validated['date_out'])
+            ->setTime(now()->hour, now()->minute, now()->second);
+        
+        $reservation = Reservation::create([
+            'room_id' => $validated['room_id'],
+            'date_in' => $dateIn,
+            'date_out' => $dateOut,
+            'status' => 'booked',
+        ]);
+
+        Guest::create([
+            'reserv_id' => $reservation->id,
+            'name' => $validated['name'],
+            'surname' => $validated['surname'],
+            'patronymic' => $validated['patronymic'],
+            'address' => $validated['address'],
+            'number' => $validated['phone'],
+            'passport' => $validated['passport'],
+        ]);
+
+        return back();
     }
 
     private function getRoomFields()
