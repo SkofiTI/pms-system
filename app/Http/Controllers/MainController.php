@@ -83,7 +83,7 @@ class MainController extends Controller
         $dateOut = Carbon::parse($validated['date_out'])
             ->setTime(now()->hour, now()->minute, now()->second);
         
-        $reservation = Reservation::create([
+        $reservation = Reservation::firstOrCreate([
             'room_id' => $validated['room_id'],
             'date_in' => $dateIn,
             'date_out' => $dateOut,
