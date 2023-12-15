@@ -39,7 +39,44 @@
             </a-descriptions>
         </a-page-header>
 
-        <a-calendar :dateFullCellRender="dateFullCellRender" />
+        <a-calendar />
+
+        <a-form
+            :model="formState"
+            layout="vertical"
+            @finish="onFinish"
+            class="form"
+        >
+            <a-input type="hidden" v-model:value="room.room_id" />
+            <a-form-item label="Имя">
+                <a-input type="text" v-model:value="formState.name" />
+            </a-form-item>
+            <a-form-item label="Фамилия">
+                <a-input type="text" v-model:value="formState.surname" />
+            </a-form-item>
+            <a-form-item label="Отчество">
+                <a-input type="text" v-model:value="formState.patronymic" />
+            </a-form-item>
+            <a-form-item label="Адрес">
+                <a-input type="text" v-model:value="formState.address" />
+            </a-form-item>
+            <a-form-item label="Номер телефона">
+                <a-input type="tel" v-model:value="formState.phone" />
+            </a-form-item>
+            <a-form-item label="Паспорт">
+                <a-input type="text" v-model:value="formState.passport" />
+            </a-form-item>
+            <a-form-item label="Дата заезда">
+                <a-input type="date" v-model:value="formState.date_in" />
+            </a-form-item>
+            <a-form-item label="Дата отбытия">
+                <a-input type="date" v-model:value="formState.date_out" />
+            </a-form-item>
+            <a-space :size="8">
+                <a-button html-type="submit" type="primary">Отправить</a-button>
+                <a-button html-type="reset" danger>Очистить форму</a-button>
+            </a-space>
+        </a-form>
     </div>
 </template>
 
@@ -53,6 +90,11 @@ import {
     Descriptions,
     DescriptionsItem,
     Calendar,
+    Form,
+    FormItem,
+    Input,
+    Button,
+    Space,
 } from "ant-design-vue";
 
 import dayjs from "dayjs";
@@ -70,16 +112,36 @@ export default {
         ADescriptions: Descriptions,
         ADescriptionsItem: DescriptionsItem,
         ACalendar: Calendar,
+        AForm: Form,
+        AFormItem: FormItem,
+        AInput: Input,
+        AButton: Button,
+        ASpace: Space,
     },
     data() {
         return {
             dateIn: dayjs(this.bookingDates[0].date_in),
             dateOut: dayjs(this.bookingDates[0].date_out),
+
+            formState: {
+                room_id: this.room.room_id,
+                name: "",
+                surname: "",
+                patronymic: "",
+                address: "",
+                phone: "",
+                passport: "",
+                date_in: "",
+                date_out: "",
+            },
         };
     },
     methods: {
         goBack() {
             router.get("/");
+        },
+        onFinish() {
+            router.post("/rooms", this.formState);
         },
     },
 };
@@ -89,5 +151,10 @@ export default {
 .wrapper {
     padding: 5px 15px;
     border: 1px solid rgb(235, 237, 240);
+}
+
+.form {
+    margin: 0 auto;
+    max-width: 600px;
 }
 </style>
