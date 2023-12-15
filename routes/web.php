@@ -16,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MainController::class, 'index'])->name('home');
 Route::get('/rooms/{roomId}', [MainController::class, 'show'])->name('show');
+Route::post('/rooms', [MainController::class, 'store'])->name('store');
