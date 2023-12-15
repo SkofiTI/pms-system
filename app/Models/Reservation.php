@@ -9,6 +9,13 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'room_id',
+        'date_in',
+        'date_out',
+        'status'
+    ];
+
     public function guests()
     {
         return $this->hasMany(Guest::class);

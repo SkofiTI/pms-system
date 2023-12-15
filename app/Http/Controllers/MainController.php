@@ -29,18 +29,18 @@ class MainController extends Controller
             ->select($this->getRoomFields())
             ->where('room_id', $roomId)
             ->first();
-        
+
         $reservationData = Reservation::query()
             ->select('date_in', 'date_out', 'status')
             ->where('room_id', $roomId)
             ->get();
-        
+
         $bookingDates = [];
 
         foreach ($reservationData as $bookingDate) {
             $dateIn = strtotime($bookingDate['date_in']);
             $dateOut = strtotime($bookingDate['date_out']);
-        
+
             $bookingDates[] = [
                 'date_in' => [
                     'day' => date('d', $dateIn),
@@ -79,11 +79,11 @@ class MainController extends Controller
 
         $dateIn = Carbon::parse($validated['date_in'])
             ->setTime(now()->hour, now()->minute, now()->second);
-        
+
         $dateOut = Carbon::parse($validated['date_out'])
             ->setTime(now()->hour, now()->minute, now()->second);
-        
-        $reservation = Reservation::firstOrCreate([
+
+        $reservation = Reservation::createOrFirst([
             'room_id' => $validated['room_id'],
             'date_in' => $dateIn,
             'date_out' => $dateOut,
