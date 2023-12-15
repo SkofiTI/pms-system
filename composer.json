@@ -9,7 +9,9 @@
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.11",
         "laravel/framework": "^10.10",
-        "laravel/tinker": "^2.8"
+        "laravel/tinker": "^2.8",
+        "open-admin-ext/helpers": "^1.0",
+        "open-admin-org/open-admin": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
