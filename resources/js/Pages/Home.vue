@@ -2,24 +2,18 @@
     <div class="wrapper">
         <a-table
             :columns="columns"
+            :row-key="(record) => record.key"
             :data-source="rows"
             :pagination="pagination"
             :customRow="customRowHandler"
-            rowClassName="row"
+            :scroll="{ x: 1000, y: 1000 }"
             bordered
         >
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'number'">
                     <a @click="goToRoom(record.key)">{{ record.number }}</a>
                 </template>
-                <template
-                    v-else-if="
-                        column.key === 'airConditioner' ||
-                        column.key === 'TV' ||
-                        column.key === 'balcony' ||
-                        column.key === 'forSmokers'
-                    "
-                >
+                <template v-if="column.key === 'airConditioner'">
                     <a-tag
                         :color="
                             record.airConditioner === 'Да' ? 'green' : 'volcano'
@@ -27,25 +21,47 @@
                         >{{ record.airConditioner }}</a-tag
                     >
                 </template>
+                <template v-else-if="column.key === 'TV'">
+                    <a-tag :color="record.TV === 'Да' ? 'green' : 'volcano'">{{
+                        record.TV
+                    }}</a-tag>
+                </template>
+                <template v-else-if="column.key === 'balcony'">
+                    <a-tag
+                        :color="record.balcony === 'Да' ? 'green' : 'volcano'"
+                        >{{ record.balcony }}</a-tag
+                    >
+                </template>
+                <template v-else-if="column.key === 'forSmokers'">
+                    <a-tag
+                        :color="
+                            record.forSmokers === 'Да' ? 'green' : 'volcano'
+                        "
+                        >{{ record.forSmokers }}</a-tag
+                    >
+                </template>
             </template>
-            <template #title><h2>Все номера</h2></template>
+            <template #title
+                ><a-typography-title :level="3">Все номера</a-typography-title>
+            </template>
         </a-table>
     </div>
 </template>
 
 <script>
-import { Table, Tag } from "ant-design-vue";
+import { Table, Tag, TypographyTitle } from "ant-design-vue";
 import { router } from "@inertiajs/vue3";
 
 export default {
     components: {
         ATable: Table,
         ATag: Tag,
+        ATypographyTitle: TypographyTitle,
     },
     props: {
         rooms: Array,
     },
-    setup(props) {
+    data() {
         const columns = [
             {
                 title: "Номер",
@@ -105,7 +121,7 @@ export default {
         ];
 
         const rows = [];
-        for (const r of props.rooms) {
+        for (const r of this.rooms) {
             rows.push({
                 key: r.room_id,
                 number: r.room_id,
@@ -122,14 +138,12 @@ export default {
             });
         }
 
-        const pagination = {
-            pageSize: 12,
-        };
-
         return {
             rows,
             columns,
-            pagination,
+            pagination: {
+                pageSize: 12,
+            },
         };
     },
     methods: {
