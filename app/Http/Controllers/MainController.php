@@ -10,12 +10,32 @@ use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::query()
-            ->join('categories', 'rooms.category_id', '=', 'categories.category_id')
-            ->select($this->getRoomFields())
-            ->get();
+        $validated = $request->validate([
+            'date_in' => 'nullable|date',
+            'date_out' => 'nullable|date|after:date_in',
+        ]);
+
+        $dateIn = $validated['date_in'] ?? null;
+        $dateOut = $validated['date_out'] ?? null;
+
+        if (!($dateIn && $dateOut)) {
+            $rooms = Room::query()
+                ->join('categories', 'rooms.category_id', '=', 'categories.category_id')
+                ->select($this->getRoomFields())
+                ->get();
+        } else {
+            $rooms = Room::whereNotIn('room_id', function ($query) use ($dateIn, $dateOut) {
+                $query->select('room_id')
+                    ->from('reservations')
+                    ->whereBetween('date_in', [$dateIn, $dateOut])
+                    ->orWhereBetween('date_out', [$dateIn, $dateOut]);
+                })
+                ->join('categories', 'rooms.category_id', '=', 'categories.category_id')
+                ->select($this->getRoomFields())
+                ->get();
+        }
 
         return inertia('Home', [
             'rooms' => $rooms,
