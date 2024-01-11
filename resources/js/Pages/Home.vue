@@ -1,5 +1,17 @@
 <template>
     <div class="wrapper">
+        <div class="header">
+            <div class="title-wrapper">
+                <a-typography-title :level="3">Все номера</a-typography-title>
+            </div>
+            <div class="date-inputs">
+                <a-date-picker v-model="date_in" placeholder="Дата заселения" @change="handleDateInChange" />
+                <a-date-picker v-model="date_out" placeholder="Дата выселения" @change="handleDateOutChange" />
+                <a-button type="primary" @click="applyDates">Применить</a-button>
+                <a-button danger @click="dropDates">Сбросить фильтр</a-button>
+            </div>
+        </div>
+        
         <a-table
             :columns="columns"
             :row-key="(record) => record.key"
@@ -41,15 +53,15 @@
                     >
                 </template>
             </template>
-            <template #title
+            <!-- <template #title
                 ><a-typography-title :level="3">Все номера</a-typography-title>
-            </template>
+            </template> -->
         </a-table>
     </div>
 </template>
 
 <script>
-import { Table, Tag, TypographyTitle } from "ant-design-vue";
+import { Table, Tag, DatePicker, Button, TypographyTitle } from "ant-design-vue";
 import { router } from "@inertiajs/vue3";
 
 export default {
@@ -57,6 +69,8 @@ export default {
         ATable: Table,
         ATag: Tag,
         ATypographyTitle: TypographyTitle,
+        ADatePicker: DatePicker,
+        AButton: Button,
     },
     props: {
         rooms: Array,
@@ -144,6 +158,8 @@ export default {
             pagination: {
                 pageSize: 12,
             },
+            date_in: null,
+            date_out: null,
         };
     },
     methods: {
@@ -157,6 +173,21 @@ export default {
                 },
             };
         },
+        handleDateInChange(value) {
+            this.date_in = value;
+        },
+        handleDateOutChange(value) {
+            this.date_out = value;
+        },
+        applyDates() {            
+            router.get('/', {
+                date_in: this.date_in.format('YYYY-MM-DD'),
+                date_out: this.date_out.format('YYYY-MM-DD'),
+            });
+        },
+        dropDates() {
+            router.get('/');
+        },
     },
 };
 </script>
@@ -164,5 +195,17 @@ export default {
 <style scoped>
 .wrapper {
     padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 8px;
 }
 </style>
